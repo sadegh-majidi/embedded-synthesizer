@@ -1,0 +1,8 @@
+auxlib==0.0.43
+evdev==1.6.1
+PyAudio==0.2.13
+pygame-ce==2.3.0
+pynput==1.7.6
+python-xlib==0.33
+RPi.GPIO==0.7.1
+six==1.16.0

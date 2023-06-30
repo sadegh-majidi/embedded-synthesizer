@@ -43,9 +43,28 @@ classic_guitar_freq = {
     'E3': 164.8
 }
 
+kalimba_freq = {
+    'A3': 110,
+    'B': 61.7,
+    'B3': 247,
+    'C': 261.6,
+    'C1': 32.7,
+    'C2': 65.4,
+    'D': 36.7,
+    'D5': 587.4,
+    'E5': 659.28,
+    'F#': 46.2,
+    'F2': 87.3,
+    'F3': 174.6,
+    'F4': 349.2,
+    'G': 49,
+    'G3': 196,
+}
+
 instruments = {
     1: ('piano', piano_notes_freq, 120, 240),
-    2: ('classic_guitar', classic_guitar_freq, 30, 150)
+    2: ('classic_guitar', classic_guitar_freq, 30, 150),
+    3: ('kalimba', kalimba_freq, 30, 660)
 }
 
 PWM_FREQUENCY = 100
@@ -112,3 +131,4 @@ def turn_off_equalizer_lights():
 def equalizer_cleanup():
     turn_off_equalizer_lights()
     GPIO.cleanup()
+

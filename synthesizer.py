@@ -1,14 +1,15 @@
+from datetime import datetime
+import multiprocessing
+from recorder import record, RECORD_SECONDS
 import pygame
 from pygame.locals import *
 import time
 from equalizer import *
 
-# Initialize pygame
 pygame.init()
 pygame.mixer.init()
 pygame.mixer.set_num_channels(50)
 
-# Define the piano notes and corresponding keystrokes (These notes cover a full octave)
 
 piano_notes = {
     K_a: 'C',
@@ -23,6 +24,24 @@ piano_notes = {
     K_v: 'A',
     K_b: 'A#',
     K_n: 'B'
+}
+
+kalimba_notes = {
+    K_a: 'A3',
+    K_s: 'B',
+    K_d: 'B3',
+    K_f: 'C',
+    K_g: 'C1',
+    K_h: 'C2',
+    K_j: 'D',
+    K_q: 'D5',
+    K_w: 'E5',
+    K_e: 'F#',
+    K_r: 'F2',
+    K_t: 'F3',
+    K_y: 'F4',
+    K_u: 'G',
+    K_i: 'G3',
 }
 
 classic_guitar_notes = {
@@ -55,14 +74,14 @@ classic_guitar_notes = {
 
 instruments = {
     1: ('piano', piano_notes),
-    2: ('classic_guitar', classic_guitar_notes)
+    2: ('classic_guitar', classic_guitar_notes),
+    3: ('kalimba', kalimba_notes)
 }
 
-selected_instrument = int(input('Please select your instrument:\n1. Piano\n2. Classic Guitar\nYour choice: '))
+selected_instrument = int(input('Please select your instrument:\n1. Piano\n2. Classic Guitar\n3. Kalimba\nYour choice: '))
 
 key_channels = {}
 
-# Create a dictionary to store the channels for each note
 note_channels = {}
 
 note_sounds = {}
@@ -74,7 +93,6 @@ if selected_instrument and instruments.get(selected_instrument):
     for i, key in enumerate(list(instrument_notes.keys())):
         key_channels[key] = i + 1
 
-    # Load the piano sound files and assign a channel for each note
     for key, note in instrument_notes.items():
         sound_file = f'{instrument[0]}_notes/{note}.wav'  # Assuming you have WAV files for each note
         sound = pygame.mixer.Sound(sound_file)
@@ -88,16 +106,24 @@ else:
     exit()
 
 
-# Create a dictionary to keep track of currently pressed keys
 pressed_keys = {}
 
-# Create a screen to capture events
 screen = pygame.display.set_mode((1, 1))
 pygame.mixer.music.set_endevent(USEREVENT)
 
-# Start the main loop
+p1 = multiprocessing.Process(target=record)
+p1.start()
+start_time = datetime.now()
+print('Recording is started.')
+recording = True
+
 while True:
-    # Check for events
+    if recording:
+        time_delta = datetime.now() - start_time
+        if time_delta.total_seconds() >= RECORD_SECONDS:
+            print('Recording is ended.')
+            recording = False
+
     for event in pygame.event.get():
         if event.type == QUIT:
             equalizer_cleanup()
@@ -109,10 +135,8 @@ while True:
                 equalizer_cleanup()
                 pygame.quit()
                 exit()
-            # Store the currently pressed key
             pressed_keys[event.key] = True
 
-            # Play the corresponding note if it's not already playing
             if event.key in note_channels:
                 channel = note_channels[event.key]
                 if channel.get_busy():
@@ -121,7 +145,6 @@ while True:
                 turn_on_equalizer_lights(instrument_notes[event.key])
 
         elif event.type == KEYUP:
-            # Remove the released key from the dictionary
             if event.key in pressed_keys:
                 del pressed_keys[event.key]
 
@@ -134,7 +157,6 @@ while True:
             if still_active:
                 turn_on_equalizer_lights(still_active)
 
-    # If multiple keys are pressed, play all corresponding notes
     if len(pressed_keys) > 1:
         for key in pressed_keys:
             channel = note_channels[key]
@@ -143,5 +165,5 @@ while True:
             channel.play(note_sounds[key])
             turn_on_equalizer_lights(instrument_notes[key])
 
-    # Add a small delay to prevent the loop from consuming too much CPU
     time.sleep(0.005)
+
