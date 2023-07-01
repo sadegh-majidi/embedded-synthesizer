@@ -36,3 +36,4 @@ def record():
     wf.setframerate(RATE)
     wf.writeframes(b''.join(frames))
     wf.close()
+

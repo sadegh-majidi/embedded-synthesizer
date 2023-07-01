@@ -1,6 +1,6 @@
 from datetime import datetime
 import multiprocessing
-from recorder import record, RECORD_SECONDS
+from recor_script import record
 import pygame
 from pygame.locals import *
 import time
@@ -118,11 +118,6 @@ print('Recording is started.')
 recording = True
 
 while True:
-    if recording:
-        time_delta = datetime.now() - start_time
-        if time_delta.total_seconds() >= RECORD_SECONDS:
-            print('Recording is ended.')
-            recording = False
 
     for event in pygame.event.get():
         if event.type == QUIT:
